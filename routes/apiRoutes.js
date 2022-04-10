@@ -1,24 +1,32 @@
-const router = require('express').Router();
-const { createNewNote, updateDb } = require("../lib/notes");
-const { v4: uuidv4 } = require('uuid');
-const { notes } = require("../Develop/db/db.json");
+const fs = require("fs")
+const { v4: uuid } = require('uuid')
+const path = require("path")
 
-// show all notes in json data
-router.get("/notes", (req, res) => {
-  let results = notes;
-  res.json(results);
-});
+//API for renderning  notes stored on db
+module.exports = (app) => {
+  app.get("/api/notes", (req, res) => res.sendFile(path.join(__dirname, "../db/db.json")))
 
-router.post("/notes", (req, res) => {
-  req.body.id = uuidv4();
-  const newNote = createNewNote(req.body, notes);
-  res.json(newNote);
-});
+  //API for storing user added note and renderning updated  notes stored on db.json
+  app.post("/api/notes", (req, res) => {
+    let newNote = {
+      //UUID generates random id
+      id: uuid(),
+      title: req.body.title,
+      text: req.body.text
+    };
+    let oldNote = JSON.parse(fs.readFileSync(path.join(__dirname, "../db/db.json"), "utf-8"))
+    oldNote.push(newNote)
+    fs.writeFileSync("./db/db.json", JSON.stringify(oldNote))
+    res.json(oldNote)
+  })
 
-router.delete("/notes/:id", (req, res) => {
-  const params = req.params.id
-  updateDb(params, notes);
-  res.redirect('');
-});
 
-module.exports = router;
+  // Get query parameter to delete note
+  app.delete("/api/notes/:id", (req, res) => {
+    let selNote = req.params.id
+    let oldNote = JSON.parse(fs.readFileSync(path.join(__dirname, "../db/db.json"), "utf-8"))
+    const newNote = oldNote.filter(oldNote => oldNote.id != selNote)
+    fs.writeFileSync("./db/db.json", JSON.stringify(newNote))
+    res.send(newNote)
+  })
+}
