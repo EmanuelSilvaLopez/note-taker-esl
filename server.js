@@ -1,10 +1,9 @@
 const express = require("express")
 
-//Port listen on
-const PORT = process.env.PORT || 3001;
 const app = express()
 
-
+//Port listen on
+const PORT = process.env.PORT || 3001;
 
 
 //Reading static file inside public folders
@@ -20,4 +19,4 @@ require("./routes/htmlRoutes")(app);
 //Port listening on
 app.listen(PORT, () => {
     console.log(`PORT Listening ON ${PORT}`)
-})
+});
