@@ -3,7 +3,7 @@ const app = express()
 
 
 //Port listen on
-const PORT = process.env.PORT || 3001
+const PORT = process.env.PORT || 3000
 
 //Reading static file inside public folders
 app.use(express.static(__dirname + '/public'));
